@@ -158,6 +158,7 @@ function buildSlidePrompt(s: State): string {
     ? `\nThis deck is the "${s.slideType}" of a multi-chapter presentation. Adjust tone and pacing accordingly.`
     : "";
 
+  // [Slide Structure]
   const slideStructure = s.slides
     .slice(0, count)
     .map((sl, i) => {
@@ -171,60 +172,75 @@ function buildSlidePrompt(s: State): string {
               : sl.role === "요약"
                 ? "Summary / Next Action"
                 : "(skip this slide)";
-      const contentNote = sl.content.trim()
-        ? `Content hint: ${sl.content.trim()}`
-        : "Generate content automatically based on the deck theme.";
-      return `${i + 1}. ${roleLabel}: ${contentNote}`;
+      const content = sl.content.trim() || "Generate content automatically based on the deck theme.";
+      return `${i + 1}. ${roleLabel}: ${content}`;
     })
     .join("\n");
 
-  const decorations: string[] = [];
-  if (s.showPageNumber)
-    decorations.push('Include page numbers in "current/total" format, placed unobtrusively.');
-  if (s.showFooterTitle)
-    decorations.push("Repeat the deck title in the footer for continuity.");
+  // [Common Rules] — decoration + brand color
+  const commonRules: string[] = [];
+  if (s.brandColor.trim()) commonRules.push(`- Brand color: ${s.brandColor.trim()}`);
+  if (s.showPageNumber) commonRules.push('- Include page numbers in "current/total" format, placed unobtrusively.');
+  if (s.showFooterTitle) commonRules.push("- Repeat the deck title in the footer for continuity.");
 
-  const credits: string[] = [];
-  if (s.authorName) credits.push(`Author: ${s.authorName}`);
-  if (s.company) credits.push(`Company: ${s.company}`);
-  if (s.date) credits.push(`Date: ${s.date}`);
-  if (s.contact) credits.push(`Contact: ${s.contact}`);
-  if (s.cta) credits.push(`CTA: ${s.cta}`);
-
-  const brandColorLine = s.brandColor.trim()
-    ? `\nBrand color: ${s.brandColor.trim()}`
-    : "";
-
-  const additionalLine = s.additionalInstructions.trim()
-    ? `\n[Additional Instructions]\n${s.additionalInstructions.trim()}`
-    : "";
-
+  // [Design Rules] layout overrides
   const coverLayoutLine =
     s.coverPosition === "오른쪽"
       ? "Cover layout: message on the right, visual on the left."
-      : "Cover layout: message on the left, visual on the right.";
-
+      : "Cover layout: message on the left (typography: title, subtitle, credits) and visual on the right.";
   const summaryLayoutLine =
     s.summaryLayout === "상하 2단"
       ? "Summary layout: top message / bottom next actions (stacked two-row)."
       : "Summary layout: left recap message / right next actions (side-by-side).";
 
-  const conceptLine = [s.coreMessage.trim(), s.impression.trim()]
-    .filter(Boolean)
-    .join(" — ");
+  // [Concept] base + deck theme
+  const conceptBase = "Large headings readable during projection, generous spacing, and one clear theme per slide.";
+  const conceptTheme = s.title.trim() ? ` Slide deck theme: "${s.title.trim()}"` : "";
+  const concept = conceptBase + conceptTheme;
 
-  const promptParts = [
+  // [Credit Information] — placement-instruction format
+  const creditLines: string[] = [];
+  const slide1Credits = [
+    s.authorName.trim() ? `Presenter: "${s.authorName.trim()}"` : "",
+    s.company.trim() ? `Affiliation: "${s.company.trim()}"` : "",
+    s.date.trim() ? `Date: "${s.date.trim()}"` : "",
+  ].filter(Boolean).join(", ");
+  if (slide1Credits) {
+    creditLines.push(`- Place ${slide1Credits} subtly in a corner of slide 1, small enough not to compete with the main message.`);
+  }
+  if (s.contact.trim()) {
+    creditLines.push(`- Place "${s.contact.trim()}" subtly in a corner of the final slide.`);
+  }
+  if (s.cta.trim()) {
+    creditLines.push(`- Place "${s.cta.trim()}" on the final slide as a visible call to action. Do not make it look like a button UI; use text and icons naturally.`);
+  }
+
+  // [Final Instruction] — proceed mode
+  const finalInstruction =
+    s.proceedMode === "구성안 확인"
+      ? [
+          "Before generating any images, first present the complete slide outline — slide number, type, and a one-line content summary for each slide — then wait for my confirmation before proceeding.",
+          "Once confirmed, use imagegen without fail and generate the slide images one by one in the order above.",
+          "Do not stop at the outline after confirmation. Create all completed slide images.",
+        ].join("\n")
+      : [
+          "Use imagegen without fail, and generate the slide images one by one in the order above.",
+          "Do not stop at the outline. Create all completed slide images.",
+        ].join("\n");
+
+  const promptParts: string[] = [
     "You are a professional slide designer.",
-    `Create a ${count}-slide presentation${s.target.trim() ? ` for ${s.target.trim()}` : " for seminars or internal meetings"} in one consistent visual world.`,
+    `Create a ${count}-slide presentation for seminars or internal meetings in one consistent visual world.`,
     "",
     "[Output Format]",
     "- Image ratio: 16:9 widescreen presentation",
     `- Number of slides: ${count}`,
     "- Image generation: use imagegen to generate the slide images sequentially",
     "",
-    conceptLine
-      ? `[Concept]${conceptLine}`
-      : "[Concept]Large headings readable during projection, generous spacing, and one clear theme per slide",
+    `[Concept]${concept}`,
+    ...(s.target.trim() ? ["", `[Target]${s.target.trim()}`] : []),
+    ...(s.coreMessage.trim() ? ["", `[Main Message]${s.coreMessage.trim()}`] : []),
+    ...(s.impression.trim() ? ["", `[Desired Impression]${s.impression.trim()}`] : []),
     "",
     `[Language Rule]\n${languageRule}`,
     "",
@@ -233,56 +249,84 @@ function buildSlidePrompt(s: State): string {
     `[Typography]${typographyRule}${typefaceRule ? " " + typefaceRule : ""}`,
     "",
     "[Common Rules]",
-    ...(brandColorLine ? [brandColorLine] : []),
-    ...(decorations.length > 0 ? decorations.map((d) => `- ${d}`) : []),
+    ...commonRules,
     "",
     "[Design Rules]",
-    "- Visual consistency: All slides must look as if the same designer created them in sequence. Match not only colors and typography, but also the level of decoration, illustration density, diagram detail, and dimensionality.",
-    "- Composition variety: Do not repeat the same composition across the deck. Change the lead element according to the content.",
-    "- Information density: Limit each slide to one message. Bullet lists should have at most three items.",
-    "- Spacing: Keep a safe margin on all four edges equal to about 7-8% of the short side. Keep at least 30% of the canvas as empty space.",
-    "- Communication: Minimize text and communicate through diagrams, icons, and generous empty space.",
-    '- Typography cue: Place a subtle 1-2 word English catchphrase directly above the main heading (e.g. STEP 01 / INSPECT). Do not use generic labels like COVER or OUTRO.',
-    "- Layout freedom: Leave the upper-right area intentionally quiet.",
+    "- Visual consistency: All slides must look as if the same designer created them in sequence. Match not only colors and typography, but also the level of decoration, illustration density, diagram detail, and dimensionality. Avoid any variation in decorative density across slides.",
+    "- Composition variety: Do not repeat the same composition across the deck. Change the lead element according to the content, such as a main visual, character, large number, striking short phrase, list, or chart. Vary the camera position and focal subject while staying inside the same visual world. Choose the best presentation style for each slide based on its content and purpose.",
+    "- Information density: Limit each slide to one message. Do not pack multiple points into one slide. Prioritize quick visual comprehension over volume of information. Bullet lists should have at most three items, and each item should fit on one short line.",
+    "- Spacing: Keep a safe margin on all four edges equal to about 7-8% of the short side of the canvas. Place all sublabels, titles, subcopy, diagrams, and decoration inside this safe area. Do not push elements to the edge. Keep at least 30% of the canvas as empty space. Aligning the safe-area starting point helps title positions and title sizes feel consistent across slides.",
+    "- Communication: Minimize text and communicate through diagrams, icons, and generous empty space. Avoid layouts made from text blocks arranged in rows and columns.",
+    "- Typography cue: Place a subtle 1-2 word English catchphrase directly above the main heading to preview its meaning, such as STEP 01 / INSPECT, PRIORITY 01 / INFRASTRUCTURE, or NEW FEATURE / RELEASE. Do not use generic type labels such as COVER, INTRO, BODY, or OUTRO. Choose words that match the slide content.",
+    "- Layout freedom: Leave the upper-right area intentionally quiet. Do not fill it with category icons, decorative quotation marks, geometric accents, logo-like badges, or extra information. Keep the right side open so attention stays on the main heading.",
+    "- Deck flow: Treat slide 1 as the Cover and the final slide as the closing slide for summary or next action. Follow the separate [Slide-Type Layout Rules] block for layout, placement, and prohibited patterns for each slide type.",
+    "- Page number: Do not include page numbers.",
+    "- Photo handling: If using photos, real people, buildings, or spaces, let the photo stand alone as a quiet visual. Do not overlay text, numbers, icons, cards, charts, speech bubbles, logos, or decorative badges on the photo. Place explanatory text, metrics, and supporting information in an independent area physically separated from the photo zone.",
     `- ${coverLayoutLine}`,
     `- ${summaryLayoutLine}`,
-    ...(isChapterMode ? [chapterContext] : []),
+    ...(isChapterMode ? [`- ${chapterContext.trim()}`] : []),
     "",
     "[Prohibited Patterns]",
-    "- Card-row template ban: Do not use three or four white rounded cards in a row.",
-    "- Step-flow template ban: Avoid numbered badge step diagrams.",
+    "- Card-row template ban: Do not use the default AI template of three or four white rounded cards in a row, each with a pale circular icon background, heading, and one-line description. Prefer asymmetric, editorial, magazine-like layouts.",
+    "- Step-flow template ban: Avoid AI-template step diagrams made from numbered badges, icons, labels, and arrows. Express procedures through typesetting, typography, and custom diagrams.",
+    ...(s.additionalInstructions.trim()
+      ? ["", "[Additional Instructions]", s.additionalInstructions.trim()]
+      : []),
     "",
     "[Slide-Type Layout Rules]",
-    "### Cover",
-    "Layout: Side-by-side. Left: typography (title, subtitle, credits). Right: symbolic visual scene.",
-    "Prohibited: icon-organizing layout; top-and-bottom two-tier composition.",
+    "For each slide type used in this deck, follow the rules below and draw each type differently.",
     "",
-    "### Intro",
-    "Layout: Top heading + subcopy. Bottom: table-of-contents or roadmap with 3-5 icons and labels.",
-    "Prohibited: left-right split; pictorial 3D diagram in the lower area.",
+    "### Cover (COVER, slide 1)",
+    "Layout: Place the message on the left and the visual on the right in a side-by-side composition. Do not lock the ratio at 50:50; distribute space freely for the design.",
+    "- left: Typography, including main title, subtitle, and small credits such as presenter and date.",
+    "- right: A visual scene that symbolizes the deck's world, such as a 3D diagram, key visual, representative illustration, or photo.",
+    "- Make the message and visual feel like a strong entrance into the story.",
     "",
-    "### Body",
-    "Layout: Top heading + subcopy. Bottom: full-width pictorial expression (3D diagram, chart, photo, editorial diagram).",
-    "Prohibited: left-right text/diagram split; intro-style icon roadmap.",
+    "Prohibited:",
+    "- Do not use an icon-organizing layout made from icon, label, and one-line description rows.",
+    "- Do not use a top-and-bottom two-tier composition. The standard is left message and right visual side by side.",
     "",
-    "### Summary / Next Action",
-    "Layout: Side-by-side. Left: recap message. Right: 3-4 next actions with icons and one-line descriptions.",
-    "Prohibited: visual-scene-centered right side; top-and-bottom two-tier.",
+    "### Intro (INTRO, slide 2)",
+    "Layout: Place the message on top and a table-of-contents or roadmap structure below. Do not lock the ratio at 50:50; distribute space freely for the design.",
+    "- Top: Main heading plus subcopy or lead sentence in 1-2 lines.",
+    "- Bottom: Table-of-contents or roadmap style, using 3-5 icons, short 1-2 word labels, and concise one-line descriptions. Arrange items horizontally or vertically with equal visual weight.",
+    "- Keep at least 10% of the canvas height as spacing between the upper and lower areas. Use one continuous background, not a separate colored band, gradient band, or framed band for the top area.",
+    "",
+    "Prohibited:",
+    "- Do not use a left-right split with text on the left and diagram on the right.",
+    "- Do not use a pictorial 3D diagram or key visual. The lower area is fixed as icon plus text organization.",
+    "",
+    "### Body (BODY, middle slides)",
+    "Layout: Place the message on top and the diagram or visual explanation below. Do not lock the ratio at 50:50; distribute space freely for the design.",
+    "- Top: Main heading plus subcopy or lead sentence in 1-2 lines.",
+    "- Bottom: Focus on pictorial expression such as a 3D diagram, key visual, photo, chart, or editorial diagram.",
+    "- Let the lower area use the full canvas width. It is acceptable to leave natural empty space to the right of the upper heading.",
+    "- Keep at least 10% of the canvas height as spacing between the upper and lower areas. Use one continuous background, not a separate colored band, gradient band, or framed band for the top area.",
+    "- Give each slide its own diagram, scene, or visual. Avoid repeating the same look.",
+    "",
+    "Prohibited:",
+    "- Do not use a left-right split with text on the left and diagram on the right.",
+    "- Do not use the intro-style table-of-contents or roadmap layout made from 3-5 icons, labels, and one-line descriptions.",
+    "",
+    "### Summary / Next Action (OUTRO, final slide)",
+    "Layout: Place the message on the left and next actions on the right in a side-by-side composition. Do not lock the ratio at 50:50; distribute space freely for the design.",
+    "- Left: Typography with a recap message and a strong closing key message.",
+    "- Right: Next actions, using 3-4 icons, short 1-2 word labels, and one-line descriptions in a vertical list or grid. Give equal visual weight to actions such as what to do next, signup route, contact, reference resource, or concrete first step.",
+    "- Make the eye flow naturally from recap on the left to next action on the right.",
+    "",
+    "Prohibited:",
+    "- Do not make the right side visual-scene-centered like the Cover. The right side is fixed as icon organization.",
+    "- Do not use a top-and-bottom two-tier composition. The standard is left message and right next actions.",
+    ...(creditLines.length > 0 ? ["", "[Credit Information]", ...creditLines] : []),
     "",
     `[Slide Structure] (${count} slides)`,
     slideStructure,
     "",
-    ...(credits.length > 0
-      ? [`[Credit Information]\n${credits.join("\n")}`]
-      : []),
-    additionalLine,
-    "",
     "[Final Instruction]",
-    "Use imagegen without fail, and generate the slide images one by one in the order above.",
-    "Do not stop at the outline. Create all completed slide images.",
+    finalInstruction,
   ];
 
-  return promptParts.filter((p) => p !== null).join("\n");
+  return promptParts.join("\n");
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
