@@ -195,6 +195,28 @@ interface DeckState {
   slides: Slide[];
 }
 
+// ─── Smart default templates by count ────────────────────────────────────────
+
+const SLIDE_COUNTS = [4, 6, 8, 10, 12, 16, 20];
+
+function defaultTemplatesForCount(n: number): TemplateId[] {
+  if (n <= 3) return (["title", "content-standard", "end"] as TemplateId[]).slice(0, n);
+  // Always: title, agenda at start; end at finish
+  // Fill middle with content-standard; insert section-divider every ~4 slides if room
+  const middle = n - 3; // excluding title, agenda, end
+  const result: TemplateId[] = ["title", "agenda"];
+  for (let i = 0; i < middle; i++) {
+    // Every 4th content slide, insert a section-divider (if middle is large enough)
+    if (middle >= 6 && i > 0 && i % 4 === 0) {
+      result.push("section-divider");
+    } else {
+      result.push("content-standard");
+    }
+  }
+  result.push("end");
+  return result.slice(0, n);
+}
+
 // ─── Default slide factory ────────────────────────────────────────────────────
 
 function makeSlide(
@@ -1612,6 +1634,23 @@ export function SlideDesignBrief() {
 
   const handleReset = () => setDeck(INITIAL);
 
+  const handleSlideCount = (n: number) => {
+    setDeck((prev) => {
+      const existing = prev.slides;
+      if (n === existing.length) return prev;
+      if (n > existing.length) {
+        // Append missing slides with smart defaults
+        const templates = defaultTemplatesForCount(n);
+        const extra = Array.from({ length: n - existing.length }, (_, i) =>
+          makeSlide(nextId(), templates[existing.length + i] ?? "content-standard"),
+        );
+        return { ...prev, slides: [...existing, ...extra] };
+      }
+      // Trim to n
+      return { ...prev, slides: existing.slice(0, n) };
+    });
+  };
+
   return (
     <div className="flex gap-6 items-start">
       {/* ── 좌측 폼 ───────────────────────────────────────────── */}
@@ -1699,6 +1738,29 @@ export function SlideDesignBrief() {
               </Field>
             </div>
             <Field>
+              <Label sub="선택하면 슬라이드 목록 자동 구성">슬라이드 수</Label>
+              <div className="flex flex-wrap gap-2">
+                {SLIDE_COUNTS.map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => handleSlideCount(n)}
+                    className={cn(
+                      "h-9 min-w-[2.5rem] rounded-lg border px-3 text-sm font-medium transition-all",
+                      deck.slides.length === n
+                        ? "border-[#152439] bg-[#152439] text-white"
+                        : "border-gray-200 bg-white hover:border-gray-300 text-gray-700",
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <span className="flex items-center text-xs text-gray-400 pl-1">
+                  (현재 {deck.slides.length}장 — 개별 추가/삭제도 가능)
+                </span>
+              </div>
+            </Field>
+
+            <Field>
               <Label sub="줄마다 섹션 이름 1개 — Agenda 슬라이드에서 자동 참조">
                 섹션 구성
               </Label>
@@ -1715,14 +1777,7 @@ export function SlideDesignBrief() {
 
         {/* ── 슬라이드 목록 ───────────────────────────────────────── */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-[#152439]">
-              슬라이드 구성{" "}
-              <span className="text-sm font-normal text-gray-400">
-                {deck.slides.length}장
-              </span>
-            </h2>
-          </div>
+          <h2 className="text-base font-bold text-[#152439]">슬라이드 구성</h2>
           {deck.slides.map((sl, i) => (
             <SlideCard
               key={sl.id}
