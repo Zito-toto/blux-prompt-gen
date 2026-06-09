@@ -7,7 +7,7 @@ import { Copy, RotateCcw, Sparkles, Check } from "lucide-react";
 type Language = "한국어 중심" | "English main" | "입력 언어 맞춤";
 type ProceedMode = "바로 생성" | "구성안 확인";
 type SlideType = "단일 모드" | "첫 챕터" | "중간 챕터" | "마지막 챕터";
-type VisualStyle = "corporate-clean" | "vivid-red" | "blue-orange" | "saas-tech";
+type VisualStyle = "navy-dark" | "paper-light" | "accent-blue" | "ink-minimal";
 type Typeface = "No specification" | "Gothic (SUIT)" | "Gothic (Pretendard)" | "Handwritten style";
 type Legibility = "높은 가독성" | "표준 가독성" | "에디토리얼 작은 글자";
 type SlideRole = "표지" | "도입" | "본론" | "요약" | "없음";
@@ -54,53 +54,43 @@ const VISUAL_STYLES: {
   nameEn: string;
   desc: string;
   tags: string[];
-  bg: string;
-  accent: string;
   promptDesc: string;
 }[] = [
   {
-    id: "corporate-clean",
-    name: "코퍼레이트 클린",
-    nameEn: "Corporate Clean",
-    desc: "화이트 기반의 넓은 여백으로 신뢰감을 만드는 기업용 스타일입니다.",
-    tags: ["신뢰", "white tone", "margin", "B2B"],
-    bg: "bg-white",
-    accent: "border-gray-200",
+    id: "navy-dark",
+    name: "네이비 다크",
+    nameEn: "Navy Dark",
+    desc: "블럭스 메인 테마. 딥 네이비 배경에 블루 악센트로 신뢰·전문성을 전달합니다. 프로젝션 발표에 최적.",
+    tags: ["dark", "navy", "presentation", "B2B"],
     promptDesc:
-      "Clean corporate slide design for business audiences, based on a white background, generous spacing, and a trustworthy tone.",
+      "Dark navy background (#0a192f) with #006FFD blue accent and white typography. Blux brand's primary theme. High contrast, professional, projection-optimized. No gradients, no shadows, no rounded cards. Urbane display font for hero text, Pretendard for body.",
   },
   {
-    id: "vivid-red",
-    name: "비비드 레드 플랫",
-    nameEn: "Vivid Red Flat",
-    desc: "오프화이트 기반에 선명한 레드를 포인트로 쓰는 플랫 비즈니스 스타일입니다.",
-    tags: ["red", "flat", "marketing", "infographic"],
-    bg: "bg-[#fff5f5]",
-    accent: "border-red-300",
+    id: "paper-light",
+    name: "페이퍼 라이트",
+    nameEn: "Paper Light",
+    desc: "오프화이트 배경에 넓은 여백과 블루 악센트. 인쇄·PDF 공유에 최적인 B2B 보고서 스타일.",
+    tags: ["light", "white", "report", "print"],
     promptDesc:
-      "Bold flat design with off-white background and vivid red as the main accent color. Marketing-forward and infographic-friendly layout.",
+      "Off-white background (#f7f9fb) with dark navy ink (#0a192f) and #006FFD blue accent. Wide margins, generous whitespace. Optimized for printed reports and PDF sharing. No gradients, no shadows, flat layout.",
   },
   {
-    id: "blue-orange",
-    name: "블루 x 오렌지 아이소메트릭",
-    nameEn: "Blue x Orange Isometric",
-    desc: "블루와 오렌지 보색 대비로 SaaS 구조와 데이터 흐름을 입체적으로 보여줍니다.",
-    tags: ["isometric", "blue", "orange", "SaaS"],
-    bg: "bg-[#f0f4ff]",
-    accent: "border-blue-300",
+    id: "accent-blue",
+    name: "악센트 블루",
+    nameEn: "Accent Blue",
+    desc: "블럭스 블루(#006FFD)를 배경 전면에 사용. 런칭·발표·키 슬라이드에 임팩트를 줍니다.",
+    tags: ["blue", "bold", "launch", "impact"],
     promptDesc:
-      "Isometric 3D illustration style with blue and orange complementary colors. Ideal for showing SaaS structures, data flows, and product architecture.",
+      "Full #006FFD blue background with white typography and #0a192f navy as secondary surface. High-impact cover and key slides. Accent color used as the dominant background — typography and geometric shapes carry the layout. No gradients, no shadows.",
   },
   {
-    id: "saas-tech",
-    name: "SaaS / 테크",
-    nameEn: "SaaS/Tech",
-    desc: "화이트와 모던 블루 중심의 클린한 SaaS/테크 기업 스타일입니다.",
-    tags: ["SaaS", "tech", "modern", "product"],
-    bg: "bg-[#f0f8ff]",
-    accent: "border-blue-200",
+    id: "ink-minimal",
+    name: "잉크 미니멀",
+    nameEn: "Ink Minimal",
+    desc: "다크 배경에 타이포그래피만으로 레이아웃을 구성. 블루 악센트는 극소량. 에디토리얼·인사이트 느낌.",
+    tags: ["minimal", "editorial", "type-driven", "dark"],
     promptDesc:
-      "Modern white and blue-dominant clean design tailored for SaaS and tech companies. Professional, product-focused visual language.",
+      "Deep navy (#0a192f) background with layout driven entirely by typography hierarchy. #006FFD accent used sparingly — one element per slide maximum. No illustrations, no icons, no decorative elements. Editorial and insight-report mood. Large Urbane display text as the primary visual element.",
   },
 ];
 
@@ -389,7 +379,7 @@ export function SlidePrompter() {
     slideCount: 6,
     customSlideCount: "",
     slideType: "단일 모드",
-    visualStyle: "corporate-clean",
+    visualStyle: "navy-dark",
     typeface: "No specification",
     legibility: "높은 가독성",
     slides: buildDefaultSlides(6),
@@ -490,7 +480,7 @@ export function SlidePrompter() {
       slideCount: 6,
       customSlideCount: "",
       slideType: "단일 모드",
-      visualStyle: "corporate-clean",
+      visualStyle: "navy-dark",
       typeface: "No specification",
       legibility: "높은 가독성",
       slides: buildDefaultSlides(6),
@@ -770,12 +760,7 @@ export function SlidePrompter() {
                   )}
                 >
                   {/* Preview tile */}
-                  <div
-                    className={cn(
-                      "h-24 w-full flex items-center justify-center",
-                      vs.bg
-                    )}
-                  >
+                  <div className="h-24 w-full flex items-center justify-center overflow-hidden">
                     <StylePreview id={vs.id} />
                   </div>
                   <div className="p-3 bg-white">
@@ -1152,52 +1137,53 @@ export function SlidePrompter() {
 // ─── Style preview tiles ──────────────────────────────────────────────────────
 
 function StylePreview({ id }: { id: VisualStyle }) {
-  if (id === "corporate-clean") {
+  if (id === "navy-dark") {
     return (
-      <div className="w-48 h-16 bg-white rounded-lg shadow-sm border border-gray-100 flex flex-col justify-center px-4 gap-1.5">
-        <div className="h-2 w-24 bg-gray-800 rounded-full" />
-        <div className="h-1.5 w-16 bg-gray-300 rounded-full" />
-        <div className="h-1.5 w-20 bg-gray-200 rounded-full" />
-      </div>
-    );
-  }
-  if (id === "vivid-red") {
-    return (
-      <div className="w-48 h-16 bg-[#1a1a1a] rounded-lg flex items-center gap-3 px-4">
-        <div className="h-8 w-1.5 bg-red-500 rounded-full" />
-        <div className="flex flex-col gap-1.5">
-          <div className="h-2 w-20 bg-red-400 rounded-full" />
-          <div className="h-1.5 w-14 bg-white/30 rounded-full" />
+      <div className="w-48 h-16 bg-[#0a192f] flex items-center px-5 gap-4">
+        <div className="flex flex-col gap-2">
+          <div className="h-1 w-6 bg-[#006ffd]" />
+          <div className="h-3 w-28 bg-white" />
+          <div className="h-1.5 w-20 bg-white/30" />
         </div>
-        <div className="ml-auto w-8 h-8 rounded bg-red-500/20 border border-red-500/40 flex items-center justify-center">
-          <div className="w-3 h-3 bg-red-500 rounded-sm" />
+        <div className="ml-auto w-8 h-8 border border-[#006ffd]/60 flex items-center justify-center shrink-0">
+          <div className="w-3 h-3 bg-[#006ffd]" />
         </div>
       </div>
     );
   }
-  if (id === "blue-orange") {
+  if (id === "paper-light") {
     return (
-      <div className="w-48 h-16 bg-[#0a1628] rounded-lg flex items-center justify-between px-4">
-        <div className="flex flex-col gap-1.5">
-          <div className="h-2 w-16 bg-[#4d9cf8] rounded-full" />
-          <div className="h-1.5 w-12 bg-white/30 rounded-full" />
+      <div className="w-48 h-16 bg-[#f7f9fb] flex items-center px-5 gap-4">
+        <div className="flex flex-col gap-2">
+          <div className="h-1 w-6 bg-[#006ffd]" />
+          <div className="h-3 w-28 bg-[#0a192f]" />
+          <div className="h-1.5 w-20 bg-[#0a192f]/25" />
         </div>
-        <div className="relative w-12 h-12">
-          <div className="absolute bottom-0 left-0 w-7 h-7 bg-[#f97316] rounded opacity-90 rotate-12" />
-          <div className="absolute top-0 right-0 w-7 h-7 bg-[#3b82f6] rounded opacity-90 -rotate-6" />
+        <div className="ml-auto flex flex-col gap-1.5 shrink-0">
+          <div className="h-1 w-10 bg-[#006ffd]/40" />
+          <div className="h-1 w-8 bg-[#0a192f]/20" />
+          <div className="h-1 w-10 bg-[#0a192f]/20" />
         </div>
       </div>
     );
   }
-  // saas-tech
+  if (id === "accent-blue") {
+    return (
+      <div className="w-48 h-16 bg-[#006ffd] flex items-center px-5">
+        <div className="flex flex-col gap-2">
+          <div className="h-1 w-6 bg-white/50" />
+          <div className="h-3.5 w-32 bg-white" />
+          <div className="h-1.5 w-20 bg-white/40" />
+        </div>
+      </div>
+    );
+  }
+  // ink-minimal
   return (
-    <div className="w-48 h-16 bg-white rounded-lg shadow-sm border border-blue-100 flex items-center gap-3 px-4">
-      <div className="w-8 h-8 rounded-lg bg-[#006ffd]/10 flex items-center justify-center shrink-0">
-        <div className="w-3.5 h-3.5 rounded-sm bg-[#006ffd]" />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <div className="h-2 w-20 bg-[#006ffd] rounded-full" />
-        <div className="h-1.5 w-14 bg-gray-200 rounded-full" />
+    <div className="w-48 h-16 bg-[#0a192f] flex items-end px-5 pb-4">
+      <div className="flex flex-col gap-1.5 w-full">
+        <div className="h-4 w-36 bg-white" />
+        <div className="h-1.5 w-16 bg-[#006ffd]" />
       </div>
     </div>
   );
