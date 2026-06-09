@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Copy, RotateCcw, Check } from "lucide-react";
+import { Copy, RotateCcw, Sparkles, Check } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1097,10 +1097,32 @@ export function SlidePrompter() {
       </section>
 
       {/* ── Actions ──────────────────────────────────────────────── */}
-      <div className="flex justify-end">
+      <div className="flex gap-2">
+        <button
+          onClick={handleCopy}
+          disabled={!livePrompt}
+          className={cn(
+            "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all",
+            !livePrompt
+              ? "cursor-not-allowed bg-gray-100 text-gray-400"
+              : "bg-[#152439] text-white shadow-sm hover:bg-[#1e3353] active:scale-[0.99]"
+          )}
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4" />
+              복사됨
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4" />
+              프롬프트 복사
+            </>
+          )}
+        </button>
         <button
           onClick={handleReset}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           초기화
