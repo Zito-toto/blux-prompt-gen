@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TagGroup } from "@/components/TagGroup";
 import { SlidePrompter } from "@/components/SlidePrompter";
+import { HtmlSlidePrompter } from "@/components/HtmlSlidePrompter";
 import { cn } from "@/lib/utils";
 import { Copy, RotateCcw, Sparkles, Check } from "lucide-react";
 
@@ -199,7 +200,7 @@ function ContentPrompter() {
   );
 }
 
-type Tab = "content" | "slide";
+type Tab = "content" | "slide" | "html";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("slide");
@@ -231,6 +232,7 @@ export default function App() {
           {(
             [
               { id: "slide" as Tab, label: "슬라이드 프롬프터" },
+              { id: "html" as Tab, label: "HTML 슬라이드 프롬프터" },
               { id: "content" as Tab, label: "콘텐츠 프롬프터" },
             ] as const
           ).map(({ id, label }) => (
@@ -255,7 +257,7 @@ export default function App() {
         "mx-auto px-6 py-8",
         tab === "slide" ? "max-w-7xl" : "max-w-3xl"
       )}>
-        {tab === "content" ? <ContentPrompter /> : <SlidePrompter />}
+        {tab === "content" ? <ContentPrompter /> : tab === "slide" ? <SlidePrompter /> : <HtmlSlidePrompter />}
       </main>
     </div>
   );
