@@ -202,13 +202,13 @@ function ContentPrompter() {
 type Tab = "content" | "slide";
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("content");
+  const [tab, setTab] = useState<Tab>("slide");
 
   return (
     <div className="min-h-screen bg-[#f7f9fb]">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
-        <div className="mx-auto max-w-3xl px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-base font-bold text-[#152439]">blux.</span>
             <span className="text-sm text-gray-300">/</span>
@@ -227,11 +227,11 @@ export default function App() {
         </div>
 
         {/* Tabs */}
-        <div className="mx-auto max-w-3xl px-6 flex gap-0 border-t border-gray-100">
+        <div className="mx-auto max-w-7xl px-6 flex gap-0 border-t border-gray-100">
           {(
             [
-              { id: "content" as Tab, label: "콘텐츠 프롬프터" },
               { id: "slide" as Tab, label: "슬라이드 프롬프터" },
+              { id: "content" as Tab, label: "콘텐츠 프롬프터" },
             ] as const
           ).map(({ id, label }) => (
             <button
@@ -251,7 +251,10 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className="mx-auto max-w-3xl px-6 py-8">
+      <main className={cn(
+        "mx-auto px-6 py-8",
+        tab === "slide" ? "max-w-7xl" : "max-w-3xl"
+      )}>
         {tab === "content" ? <ContentPrompter /> : <SlidePrompter />}
       </main>
     </div>

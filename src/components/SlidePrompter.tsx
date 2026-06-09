@@ -500,7 +500,9 @@ export function SlidePrompter() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="flex gap-6 items-start">
+      {/* ── 좌측 설정 패널 ─────────────────────────────────────── */}
+      <div className="flex-1 min-w-0 space-y-6">
       {/* ── 01 메시지 ─────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
         <SectionHeader
@@ -1081,9 +1083,10 @@ export function SlidePrompter() {
           초기화
         </button>
       </div>
+      </div>{/* end 좌측 설정 패널 */}
 
-      {/* ── Output ───────────────────────────────────────────────── */}
-      <div id="slide-output">
+      {/* ── 우측 프롬프트 패널 (sticky) ──────────────────────────── */}
+      <div className="w-[380px] shrink-0 sticky top-[105px] self-start">
         {prompt ? (
           <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
@@ -1117,15 +1120,17 @@ export function SlidePrompter() {
                 )}
               </button>
             </div>
-            <pre className="whitespace-pre-wrap break-words px-5 py-5 text-sm leading-relaxed text-gray-700 font-sans max-h-[500px] overflow-y-auto">
+            <pre className="whitespace-pre-wrap break-words px-5 py-5 text-sm leading-relaxed text-gray-700 font-sans max-h-[calc(100vh-160px)] overflow-y-auto">
               {prompt}
             </pre>
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-12 text-center">
+          <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-16 text-center">
+            <Sparkles className="h-6 w-6 text-gray-200 mx-auto mb-3" />
             <p className="text-sm text-gray-400">
-              슬라이드 수와 시각 스타일을 선택한 뒤 "프롬프트 생성"을 누르면
-              여기에 나타나요.
+              슬라이드 수와 시각 스타일을 선택한 뒤
+              <br />
+              "프롬프트 생성"을 눌러주세요.
             </p>
           </div>
         )}
