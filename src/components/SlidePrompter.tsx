@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Copy, RotateCcw, Sparkles, Check } from "lucide-react";
+import { Copy, RotateCcw, Check } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -396,7 +396,6 @@ export function SlidePrompter() {
     additionalInstructions: "",
   });
 
-  const [prompt, setPrompt] = useState("");
   const [copied, setCopied] = useState(false);
 
   const update = <K extends keyof State>(key: K, val: State[K]) =>
@@ -450,21 +449,15 @@ export function SlidePrompter() {
       ? parseInt(s.customSlideCount) || 0
       : s.slideCount;
 
-  const canGenerate = effectiveCount > 0 && s.visualStyle;
-
-  const handleGenerate = () => {
-    if (!canGenerate) return;
-    setPrompt(buildSlidePrompt(s));
-    setTimeout(() => {
-      document
-        .getElementById("slide-output")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 50);
-  };
+  // 실시간 프롬프트 — 상태가 바뀔 때마다 자동 재계산
+  const livePrompt = useMemo(
+    () => (effectiveCount > 0 && s.visualStyle ? buildSlidePrompt(s) : ""),
+    [s, effectiveCount]
+  );
 
   const handleCopy = async () => {
-    if (!prompt) return;
-    await navigator.clipboard.writeText(prompt);
+    if (!livePrompt) return;
+    await navigator.clipboard.writeText(livePrompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -496,7 +489,6 @@ export function SlidePrompter() {
       cta: "",
       additionalInstructions: "",
     });
-    setPrompt("");
   };
 
   return (
@@ -1061,23 +1053,10 @@ export function SlidePrompter() {
       </section>
 
       {/* ── Actions ──────────────────────────────────────────────── */}
-      <div className="flex gap-2">
-        <button
-          onClick={handleGenerate}
-          disabled={!canGenerate}
-          className={cn(
-            "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all",
-            !canGenerate
-              ? "cursor-not-allowed bg-gray-100 text-gray-400"
-              : "bg-[#152439] text-white shadow-sm hover:bg-[#1e3353] active:scale-[0.99]"
-          )}
-        >
-          <Sparkles className="h-4 w-4" />
-          프롬프트 생성
-        </button>
+      <div className="flex justify-end">
         <button
           onClick={handleReset}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           초기화
@@ -1085,9 +1064,9 @@ export function SlidePrompter() {
       </div>
       </div>{/* end 좌측 설정 패널 */}
 
-      {/* ── 우측 프롬프트 패널 (sticky) ──────────────────────────── */}
-      <div className="w-[380px] shrink-0 sticky top-[105px] self-start">
-        {prompt ? (
+      {/* ── 우측 프롬프트 패널 (sticky / 실시간) ────────────────── */}
+      <div className="w-[400px] shrink-0 sticky top-[105px] self-start">
+        {livePrompt ? (
           <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <div>
@@ -1121,16 +1100,15 @@ export function SlidePrompter() {
               </button>
             </div>
             <pre className="whitespace-pre-wrap break-words px-5 py-5 text-sm leading-relaxed text-gray-700 font-sans max-h-[calc(100vh-160px)] overflow-y-auto">
-              {prompt}
+              {livePrompt}
             </pre>
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-16 text-center">
-            <Sparkles className="h-6 w-6 text-gray-200 mx-auto mb-3" />
             <p className="text-sm text-gray-400">
-              슬라이드 수와 시각 스타일을 선택한 뒤
+              슬라이드 수와 시각 스타일이
               <br />
-              "프롬프트 생성"을 눌러주세요.
+              선택되면 자동으로 나타나요.
             </p>
           </div>
         )}
