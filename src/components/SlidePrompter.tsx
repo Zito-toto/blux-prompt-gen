@@ -518,7 +518,7 @@ export function SlidePrompter() {
               type="text"
               value={s.title}
               onChange={(e) => update("title", e.target.value)}
-              placeholder="예시: 2026년 2분기 영업 전략 공유 / 신규 고객 전환율 개선 방안"
+              placeholder="예시: Blux CRM 온보딩 전략 / 이커머스 재구매율을 높이는 자동화 마케팅"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
             <p className="mt-1.5 text-xs text-gray-400">
@@ -533,7 +533,7 @@ export function SlidePrompter() {
               type="text"
               value={s.target}
               onChange={(e) => update("target", e.target.value)}
-              placeholder="예시: 팀장급 실무 리더 / 영업·마케팅 담당자 / 경영진 보고 대상"
+              placeholder="예시: 이커머스 CRM 담당자 / 마케팅팀장 / 블럭스 도입 검토 중인 의사결정자"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
             <p className="mt-1.5 text-xs text-gray-400">
@@ -546,7 +546,7 @@ export function SlidePrompter() {
             <textarea
               value={s.coreMessage}
               onChange={(e) => update("coreMessage", e.target.value)}
-              placeholder="예시: 이번 분기에는 기존 고객 유지율을 높이고, 반복 구매를 만드는 실행 과제에 집중해야 합니다."
+              placeholder="예시: 블럭스 하나로 푸시·인앱·카카오를 연결하면, 고객 생애 가치가 눈에 띄게 달라집니다."
               rows={3}
               className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
@@ -561,7 +561,7 @@ export function SlidePrompter() {
               type="text"
               value={s.impression}
               onChange={(e) => update("impression", e.target.value)}
-              placeholder="예시: 신뢰감 / 실행력 / 명확함 / 전문적인 인상"
+              placeholder="예시: 바로 쓸 수 있는 느낌 / 복잡하지 않고 실용적 / 데이터 기반의 신뢰감"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
             <p className="mt-1.5 text-xs text-gray-400">
@@ -869,7 +869,7 @@ export function SlidePrompter() {
                   <textarea
                     value={sl.content}
                     onChange={(e) => handleSlideContentChange(i, e.target.value)}
-                    placeholder="(Blank = Leave it to ChatGPT)"
+                    placeholder="비워두면 GPT가 덱 주제에 맞게 자동 구성합니다. 예: 블럭스 주요 기능 3가지 — 푸시 / 인앱 / 카카오"
                     rows={2}
                     className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10 placeholder-gray-300"
                   />
@@ -897,7 +897,7 @@ export function SlidePrompter() {
               type="text"
               value={s.brandColor}
               onChange={(e) => update("brandColor", e.target.value)}
-              placeholder="예시: 검정과 흰색 중심 / #060606 and #FFFFFF"
+              placeholder="예시: 블럭스 기본 — #006FFD (blue) and #0a192f (navy)"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
             <p className="mt-1.5 text-xs text-gray-400">
@@ -1009,10 +1009,10 @@ export function SlidePrompter() {
             </p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { key: "authorName" as const, label: "작성자 Name", placeholder: "예시: Jeongmin Lee" },
-                { key: "company" as const, label: "소속 Company", placeholder: "예시: ABLD" },
-                { key: "date" as const, label: "날짜 date", placeholder: "예시: May 13, 2026" },
-                { key: "contact" as const, label: "연락처 Contact", placeholder: "예시: abld.site/@bytonylee" },
+                { key: "authorName" as const, label: "작성자 Name", placeholder: "예시: Blux Growth Team" },
+                { key: "company" as const, label: "소속 Company", placeholder: "예시: Blux" },
+                { key: "date" as const, label: "날짜 date", placeholder: "예시: June 2026" },
+                { key: "contact" as const, label: "연락처 Contact", placeholder: "예시: blux.ai / hello@blux.ai" },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <label className="block mb-1.5 text-xs font-medium text-gray-500">
@@ -1037,7 +1037,7 @@ export function SlidePrompter() {
               type="text"
               value={s.cta}
               onChange={(e) => update("cta", e.target.value)}
-              placeholder="더 많은 소식이 궁금하다면팔로우하세요. / Contact us here"
+              placeholder="예시: 지금 바로 무료 체험 → blux.ai / 데모 신청하기 → 링크 삽입"
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
             <p className="mt-1.5 text-xs text-gray-400">
@@ -1052,7 +1052,7 @@ export function SlidePrompter() {
             <textarea
               value={s.additionalInstructions}
               onChange={(e) => update("additionalInstructions", e.target.value)}
-              placeholder="예시: 사진 없이 일러스트만 사용 / Use bar graphs instead of pie charts"
+              placeholder="예시: 블럭스 UI 스크린샷 포함 / 전후 비교 다이어그램 선호 / 지표는 전환율·재구매율 중심으로"
               rows={3}
               className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition focus:border-[#006ffd] focus:bg-white focus:ring-2 focus:ring-[#006ffd]/10"
             />
