@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { TagGroup } from "@/components/TagGroup";
 import { SlidePrompter } from "@/components/SlidePrompter";
-import { HtmlSlidePrompter } from "@/components/HtmlSlidePrompter";
+import { SlideDesignBrief } from "@/components/SlideDesignBrief";
 import { cn } from "@/lib/utils";
 import { Copy, RotateCcw, Sparkles, Check } from "lucide-react";
 
 const CONFIG = {
   채널: ["LinkedIn", "인스타그램", "스레드", "유튜브", "블로그", "뉴스레터"],
-  포맷: ["카드뉴스", "텍스트 포스팅", "숏폼 스크립트", "인포그래픽", "썸네일 카피"],
+  포맷: [
+    "카드뉴스",
+    "텍스트 포스팅",
+    "숏폼 스크립트",
+    "인포그래픽",
+    "썸네일 카피",
+  ],
   톤: ["존댓말", "반말", "격식체"],
   "타겟 독자": ["CRM 실무자", "마케팅 팀장", "대표·의사결정자", "개발자"],
   "메시지 방향": [
@@ -62,7 +68,7 @@ function buildPrompt(selections: Selections, topic: string): string {
     lines.push(`\n**주제 / 소재**:\n${topic.trim()}`);
   }
   lines.push(
-    "\n---\n위 조건을 반영해서 실제로 바로 쓸 수 있는 콘텐츠를 작성해줘. 불필요한 설명 없이 결과물만 줘."
+    "\n---\n위 조건을 반영해서 실제로 바로 쓸 수 있는 콘텐츠를 작성해줘. 불필요한 설명 없이 결과물만 줘.",
   );
   return lines.join("\n");
 }
@@ -105,7 +111,7 @@ function ContentPrompter() {
               className={cn(
                 "rounded-xl border border-gray-200 bg-white p-4",
                 (category === "메시지 방향" || category === "시리즈") &&
-                  "sm:col-span-2"
+                  "sm:col-span-2",
               )}
             >
               <TagGroup
@@ -116,7 +122,7 @@ function ContentPrompter() {
                 onChange={handleChange(category)}
               />
             </div>
-          )
+          ),
         )}
       </div>
 
@@ -142,7 +148,7 @@ function ContentPrompter() {
             "inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all",
             isEmpty
               ? "cursor-not-allowed bg-gray-100 text-gray-400"
-              : "bg-[#152439] text-white shadow-sm hover:bg-[#1e3353] active:scale-[0.99]"
+              : "bg-[#152439] text-white shadow-sm hover:bg-[#1e3353] active:scale-[0.99]",
           )}
         >
           <Sparkles className="h-4 w-4" />
@@ -169,7 +175,7 @@ function ContentPrompter() {
                 "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
                 copied
                   ? "bg-green-50 text-green-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200",
               )}
             >
               {copied ? (
@@ -200,10 +206,10 @@ function ContentPrompter() {
   );
 }
 
-type Tab = "content" | "slide" | "html";
+type Tab = "content" | "slide" | "brief";
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("slide");
+  const [tab, setTab] = useState<Tab>("brief");
 
   return (
     <div className="min-h-screen bg-[#f7f9fb]">
@@ -231,8 +237,8 @@ export default function App() {
         <div className="mx-auto max-w-7xl px-6 flex gap-0 border-t border-gray-100">
           {(
             [
+              { id: "brief" as Tab, label: "슬라이드 브리프" },
               { id: "slide" as Tab, label: "슬라이드 프롬프터" },
-              { id: "html" as Tab, label: "HTML 슬라이드 프롬프터" },
               { id: "content" as Tab, label: "콘텐츠 프롬프터" },
             ] as const
           ).map(({ id, label }) => (
@@ -243,7 +249,7 @@ export default function App() {
                 "px-4 py-3 text-sm font-medium border-b-2 transition-all -mb-px",
                 tab === id
                   ? "border-[#152439] text-[#152439]"
-                  : "border-transparent text-gray-400 hover:text-gray-600"
+                  : "border-transparent text-gray-400 hover:text-gray-600",
               )}
             >
               {label}
@@ -253,11 +259,19 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className={cn(
-        "mx-auto px-6 py-8",
-        tab === "slide" ? "max-w-7xl" : "max-w-3xl"
-      )}>
-        {tab === "content" ? <ContentPrompter /> : tab === "slide" ? <SlidePrompter /> : <HtmlSlidePrompter />}
+      <main
+        className={cn(
+          "mx-auto px-6 py-8",
+          tab === "content" ? "max-w-3xl" : "max-w-[1400px]",
+        )}
+      >
+        {tab === "content" ? (
+          <ContentPrompter />
+        ) : tab === "slide" ? (
+          <SlidePrompter />
+        ) : (
+          <SlideDesignBrief />
+        )}
       </main>
     </div>
   );
