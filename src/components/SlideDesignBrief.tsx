@@ -1009,8 +1009,6 @@ function CompTableFields({
   sl: Slide;
   upd: (p: Partial<Slide>) => void;
 }) {
-  const colCount =
-    sl.compColumns.filter(Boolean).length || sl.compColumns.length;
   const setCol = (i: number, val: string) =>
     upd({ compColumns: sl.compColumns.map((c, j) => (j === i ? val : c)) });
   const addCol = () =>
